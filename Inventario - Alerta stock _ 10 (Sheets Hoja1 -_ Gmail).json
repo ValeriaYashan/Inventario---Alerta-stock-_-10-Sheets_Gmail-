@@ -1,0 +1,349 @@
+{
+  "name": "Inventario - Alerta stock < 10 (Sheets Hoja1 -> Gmail)",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1H7LQoqIRiw9U9SRZJNcupjJ7q0vgFJuBheI1rKjyiow"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1H7LQoqIRiw9U9SRZJNcupjJ7q0vgFJuBheI1rKjyiow/edit?gid=0#gid=0",
+          "__regex": "https:\\/\\/docs\\.google\\.com\\/spreadsheets\\/d\\/[0-9a-zA-Z\\-_]+.*\\#gid=([0-9]+)"
+        },
+        "event": "rowUpdate",
+        "includeInOutput": "both",
+        "options": {}
+      },
+      "id": "a5ac92f6-6d65-4aab-aee2-86483c00e2b3",
+      "name": "Google Sheets Trigger",
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        176
+      ],
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "IdxZH0aq2bVxd1Uu",
+          "name": "Google Sheets Trigger account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "a0028220-e01b-45c2-a83f-f44ad26e71be",
+              "leftValue": "={{ $json.Stock }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            },
+            {
+              "id": "f98d44bc-35ee-4d7b-ae93-9d882619b50f",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "05aa815f-9c47-4949-84a9-fc7b041d152c",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "769ec61d-f45b-4552-acd1-e20d805a5d0e",
+      "name": "IF - Stock Bajo y Sin Alerta",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -240,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "valeriayashan@gmail.com",
+        "subject": "={{'Alerta de stock bajo: ' + ($json.Producto || 'Producto')}}",
+        "message": "={{'Hola\\n\\nStock bajo detectado.\\n\\nProducto: ' + ($json.Producto || '-') + '\\nStock actual: ' + $json.Stock + '\\nUmbral: ' + $json.threshold + '\\n\\nPor favor, revisar reposici�n.\\n'}}",
+        "options": {}
+      },
+      "id": "ed2f37a4-c611-4d9b-a9f6-d271f2260468",
+      "name": "Gmail - Enviar Alerta",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        96,
+        96
+      ],
+      "webhookId": "2adbe71d-8649-4669-a111-9506e9f8968c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "eGfstZIpZnNWWb0Z",
+          "name": "Gmail account 3"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1H7LQoqIRiw9U9SRZJNcupjJ7q0vgFJuBheI1rKjyiow/edit?gid=0#gid=0",
+          "__regex": "https:\\/\\/(?:drive|docs)\\.google\\.com(?:\\/.*|)\\/d\\/([0-9a-zA-Z\\-_]+)(?:\\/.*|)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja1",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "091a347b-9610-4d7c-8b20-b10e5f3c1e18",
+      "name": "Google Sheets - Marcar Alerta",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        432,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kKEAdNueADoOW1Yd",
+          "name": "Google Sheets account 2"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "74c0bcee-e111-4f52-a721-655746a6f2a0",
+              "name": "Stock",
+              "value": "={{ $json.Stock }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -448,
+        176
+      ],
+      "id": "5bd7afb7-fa11-4f5e-aa10-2efa6863c86e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        272
+      ],
+      "id": "a780169b-db91-4081-ba03-e7a960cd9da5",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "https://docs.google.com/spreadsheets/d/1H7LQoqIRiw9U9SRZJNcupjJ7q0vgFJuBheI1rKjyiow/edit?gid=0#gid=0",
+          "__regex": "https:\\/\\/(?:drive|docs)\\.google\\.com(?:\\/.*|)\\/d\\/([0-9a-zA-Z\\-_]+)(?:\\/.*|)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Hoja1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": 0,
+            "Producto": "={{ $('Google Sheets Trigger').item.json.Producto }}",
+            "Alerta Enviada": "=Verdadero",
+            "Stock": "={{ $('Google Sheets Trigger').item.json.Stock }}"
+          },
+          "matchingColumns": [
+            "Producto"
+          ],
+          "schema": [
+            {
+              "id": "Producto",
+              "displayName": "Producto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Stock",
+              "displayName": "Stock",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Alerta Enviada",
+              "displayName": "Alerta Enviada",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        304,
+        160
+      ],
+      "id": "a86974e6-8480-4c68-a60d-a385910bf6e0",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "F8NDqkoD6lRKTC1j",
+          "name": "Google Sheets account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Stock Bajo y Sin Alerta": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Enviar Alerta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Enviar Alerta": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Marcar Alerta": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "IF - Stock Bajo y Sin Alerta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2f042532-19bd-454a-806d-6ced809399b3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "72d43304f27a5fc27696d9e2f30de2c83c79d7ac2f3ac3041823785527b7b505"
+  },
+  "id": "Z5mgHwu4HDKEu49W",
+  "tags": []
+}
